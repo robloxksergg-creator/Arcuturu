@@ -10,16 +10,8 @@ export default function Navbar({ activePage, onChangePage }) {
           <button type="button" className={`nl ${activePage === 'about' ? 'active' : ''}`} onClick={() => onChangePage('about')}>О сервере</button>
           <button type="button" className={`nl ${activePage === 'wiki' ? 'active' : ''}`} onClick={() => onChangePage('wiki')}>Вики</button>
           <button type="button" className={`nl ${activePage === 'donate' ? 'active' : ''}`} onClick={() => onChangePage('donate')}>Донат</button>
-          <button type="button" className={`nl ${activePage === 'download' ? 'active' : ''}`} onClick={() => onChangePage('download')}>Скачать</button>
         </div>
-        <button
-          type="button"
-          className="nav-ip"
-          onClick={() => onChangePage('download')}
-          style={{ cursor: 'pointer' }}
-        >
-          Arcturu.mc-join.me
-        </button>
+        <button type="button" className={`nl ${activePage === 'download' ? 'active' : ''}`} onClick={() => onChangePage('download')}>Arcturu.mc-join.me</button>
       </div>
     </div>
   )
