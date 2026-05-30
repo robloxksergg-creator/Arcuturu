@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARCTURU Canvas Background</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;overflow:hidden;background:#080412;color:#f4f2ff;font-family:Inter,sans-serif}
+    body{display:flex;align-items:center;justify-content:center}
+    canvas{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+    .overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    const starCount = 200;
+    const stars = [];
+    const clouds = [];
+    const particles = [];
+
+    function createStars(width, height){
+      stars.length = 0;
+      for(let i=0;i<starCount;i++){
+        stars.push({
+          x: Math.random()*width,
+          y: Math.random()*height*0.7,
+          r: Math.random()*1.4 + 0.7,
+          a: Math.random()*0.6 + 0.35
+        });
+      }
+    }
+
+    function createClouds(width, height){
+      clouds.length = 0;
+      for(let i=0;i<9;i++){
+        const baseX = (i/8)*width*1.25 - width*0.12;
+        const baseY = height*0.08 + Math.random()*height*0.22;
+        const size = 180 + Math.random()*220;
+        clouds.push({x:baseX,y:baseY,w:size,h:60 + Math.random()*60,a:0.08 + Math.random()*0.08,hue:270 + Math.random()*30});
+      }
+    }
+
+    function createParticles(width, height){
+      particles.length = 0;
+      for(let i=0;i<30;i++){
+        particles.push({
+          x: Math.random()*width,
+          y: height*0.2 + Math.random()*height*0.45,
+          r: Math.random()*3 + 1,
+          a: Math.random()*0.45 + 0.2
+        });
+      }
+    }
+
+    function drawBackground(width, height){
+      const bg = ctx.createLinearGradient(0,0,0,height);
+      bg.addColorStop(0,'#080412');
+      bg.addColorStop(0.45,'#1e0d35');
+      bg.addColorStop(1,'#0d0618');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0,0,width,height);
+    }
+
+    function drawStars(){
+      stars.forEach(s=>{
+        ctx.globalAlpha = s.a;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function drawMoon(width, height){
+      const moonX = width*0.8;
+      const moonY = height*0.18;
+      const moonR = Math.min(width, height)*0.055;
+      const glow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, moonR*2.5);
+      glow.addColorStop(0,'rgba(255,248,240,0.25)');
+      glow.addColorStop(1,'rgba(255,248,240,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(moonX,moonY,moonR*2.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#f8f7ff';
+      ctx.beginPath(); ctx.arc(moonX,moonY,moonR,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#0d0618';
+      ctx.beginPath(); ctx.arc(moonX-moonR*0.4,moonY,moonR*0.8,0,Math.PI*2); ctx.fill();
+    }
+
+    function drawClouds(){
+      clouds.forEach(c=>{
+        const gradient = ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,c.w*0.7);
+        gradient.addColorStop(0,`hsla(${c.hue},70%,35%,${c.a})`);
+        gradient.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.ellipse(c.x,c.y,c.w*0.7,c.h*0.6,0,0,Math.PI*2);
+        ctx.fill();
+      });
+    }
+
+    function drawMountains(width, height){
+      const base1 = height*0.62;
+      const base2 = height*0.76;
+      ctx.fillStyle = '#120826';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      const peaks1 = [0.0,0.08,0.16,0.23,0.31,0.39,0.48,0.57,0.66,0.74,0.82,0.9,1.0];
+      peaks1.forEach((v,i)=>{
+        const px = v*width;
+        const py = base1 - Math.sin(i*1.8)*height*0.035 - Math.random()*height*0.03;
+        ctx.lineTo(px, py);
+      });
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#190f31';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      const peaks2 = [0.0,0.07,0.15,0.24,0.33,0.42,0.51,0.6,0.69,0.78,0.87,0.96,1.0];
+      peaks2.forEach((v,i)=>{
+        const px = v*width;
+        const py = base2 - Math.cos(i*1.7)*height*0.04 - Math.random()*height*0.025;
+        ctx.lineTo(px, py);
+      });
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawParticles(){
+      particles.forEach(p=>{
+        ctx.globalAlpha = p.a;
+        const glow = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3.5);
+        glow.addColorStop(0,'rgba(190,110,255,0.9)');
+        glow.addColorStop(0.15,'rgba(226,160,255,0.55)');
+        glow.addColorStop(1,'rgba(226,160,255,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r*3.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(245,235,255,0.9)';
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function drawFog(width, height){
+      const fog = ctx.createLinearGradient(0,height*0.58,0,height);
+      fog.addColorStop(0,'rgba(13,6,24,0)');
+      fog.addColorStop(0.55,'rgba(13,6,24,0.28)');
+      fog.addColorStop(1,'rgba(8,2,16,0.95)');
+      ctx.fillStyle = fog;
+      ctx.fillRect(0,height*0.58,width,height*0.42);
+    }
+
+    function drawScene(){
+      const width = canvas.width = window.innerWidth;
+      const height = canvas.height = window.innerHeight;
+      drawBackground(width,height);
+      drawStars();
+      drawMoon(width,height);
+      drawClouds();
+      drawMountains(width,height);
+      drawParticles();
+      drawFog(width,height);
+    }
+
+    function init(){
+      createStars(window.innerWidth, window.innerHeight);
+      createClouds(window.innerWidth, window.innerHeight);
+      createParticles(window.innerWidth, window.innerHeight);
+      drawScene();
+    }
+
+    window.addEventListener('resize', init);
+    init();
+  </script>
+</body>
+</html>

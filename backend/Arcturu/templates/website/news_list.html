@@ -1,0 +1,39 @@
+{% extends 'website/base.html' %}
+
+{% block page_tabs %}
+  <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="p-2 rounded-pill" style="background:#0f0f10;">
+        <ul class="nav nav-pills">
+          <li class="nav-item"><a class="nav-link active" href="#">Новости</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Правила</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Пресс-кит</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Введение</a></li>
+        </ul>
+      </div>
+      <div class="ms-3 text-muted small">IP: {{ server_address }}</div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <h2>Новости сервера</h2>
+  <div class="mt-4">
+    {% for item in news_list %}
+    <div class="d-flex mb-4 news-item align-items-start">
+      <img src="/static/{{ item.image|default:'images/news-placeholder.svg' }}" class="rounded me-3" style="width:260px; height:140px; object-fit:cover;" alt="">
+      <div class="flex-grow-1">
+        <h5><a href="{{ item.get_absolute_url }}" class="text-white">{{ item.title }}</a></h5>
+        <p class="text-muted small">{{ item.category }} — {{ item.created|date:'d M Y' }}</p>
+        <p class="news-excerpt">{{ item.excerpt }}</p>
+      </div>
+      <div class="ms-3">
+        <div class="placeholder-slot small-slot">Виджет</div>
+      </div>
+    </div>
+    {% empty %}
+    <p>Новостей нет.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
